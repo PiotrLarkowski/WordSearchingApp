@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="SearchingWordApp:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/SearchingWordApp_jar</output-path>
+    <root id="archive" name="SearchingWordApp.jar">
+      <element id="module-output" name="SearchingWordApp" />
+    </root>
+  </artifact>
+</component>
