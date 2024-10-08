@@ -10,13 +10,15 @@ public class KeyHandler implements KeyListener {
     @Override
     public void keyPressed(KeyEvent e) {
         if(e.getKeyCode() == KeyEvent.VK_ENTER) {
-            MainPanel.resetStringBuilder();
+            MainPanel.printResult();
         }else if(e.getKeyCode() == KeyEvent.VK_SPACE){
             MainPanel.paintCharacter('-');
         }else if(e.getKeyCode() == KeyEvent.VK_UP){
 
         }else if(e.getKeyCode() == KeyEvent.VK_DOWN){
 
+        }else if(e.getKeyCode() == KeyEvent.VK_ESCAPE){
+            MainPanel.resetStringBuilder();
         }else{
             MainPanel.paintCharacter((char)e.getKeyCode());
         }

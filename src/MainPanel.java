@@ -11,7 +11,8 @@ public class MainPanel extends JPanel implements Runnable{
     Thread mainThread;
     final int FPS = 60;
     KeyHandler keyHandler = new KeyHandler();
-    static StringBuilder stringBuilder = new StringBuilder();
+    static StringBuilder resultData = new StringBuilder();
+    static StringBuilder searchingInputData = new StringBuilder();
     public static ArrayList<String> selectedWords = new ArrayList<>();
     public static ArrayList<String> secondSelectedWords = new ArrayList<>();
     public MainPanel() {
@@ -54,7 +55,6 @@ public class MainPanel extends JPanel implements Runnable{
                 drawCount++;
             }
             if (timer >= 1000000000) {
-                System.out.println("FPS:" + drawCount);
                 drawCount = 0;
                 timer = 0;
             }
@@ -65,21 +65,28 @@ public class MainPanel extends JPanel implements Runnable{
     }
 
     public static void paintCharacter(char character){
-        stringBuilder.append(character).append("  ");
+        searchingInputData.append(character).append("  ");
     }
     public static void resetStringBuilder(){
-        stringBuilder = new StringBuilder();
+        searchingInputData = new StringBuilder();
+        resultData = new StringBuilder();
     }
-
+    static void printResult(){
+        ArrayList<String> list = searchingWords();
+        for (String s : list) {
+            resultData.append(s);
+        }
+    }
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
         Graphics2D g2 = (Graphics2D) g;
 
         drawBlankField(g2, 50, 50);
-        drawGivenString(g2, stringBuilder.toString(),105, 90);
+        drawGivenString(g2, searchingInputData.toString(),105, 90);
 
         drawBlankField(g2, 130, 800);
-        drawGivenString(g2, "30 znakow i enter",110,170);
+//        drawGivenString(g2, "30 znakow i enter",110,170);
+        drawGivenString(g2, resultData.toString(),110,170);
     }
     private static void drawGivenString(Graphics2D g2, String text, int x, int y){
         g2.setColor(Color.BLACK);
@@ -94,7 +101,8 @@ public class MainPanel extends JPanel implements Runnable{
     }
     public static ArrayList<String> downloadWordsFile() {
         ArrayList<String> allWords = new ArrayList<>();
-        File file = new File("D:\\KRZYZOWKA\\wyrazy_2024.txt");
+//        File file = new File("D:\\KRZYZOWKA\\wyrazy_2024.txt");
+        File file = new File("C:\\Users\\PC\\Documents\\wyrazy_2024.txt");
         try {
             Scanner myReader = new Scanner(file);
             while (myReader.hasNextLine()) {
@@ -107,11 +115,11 @@ public class MainPanel extends JPanel implements Runnable{
         }
         return allWords;
     }
-    private static void searchingWords() {
+    private static ArrayList<String> searchingWords() {
         selectedWords.clear();
-        stringBuilder = new StringBuilder(stringBuilder.toString().replaceAll("\\s", ""));
+        searchingInputData = new StringBuilder(searchingInputData.toString().replaceAll("\\s", ""));
 
-        String text = stringBuilder.toString();
+        String text = searchingInputData.toString();
         downloadWordsFile();
         boolean wordPass;
         for (String s : wordsList) {
@@ -133,5 +141,6 @@ public class MainPanel extends JPanel implements Runnable{
                 secondSelectedWords.add(selectedWord);
             }
         }
+        return(secondSelectedWords);
     }
 }
