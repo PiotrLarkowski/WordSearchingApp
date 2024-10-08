@@ -7,7 +7,7 @@ public class MainPanel extends JPanel implements Runnable{
     Thread mainThread;
     final int FPS = 60;
     KeyHandler keyHandler = new KeyHandler();
-
+    static StringBuilder stringBuilder = new StringBuilder();
     public MainPanel() {
 
         this.setPreferredSize(new Dimension(WIDTH, HEIGHT));
@@ -57,12 +57,24 @@ public class MainPanel extends JPanel implements Runnable{
     public void update() {
 
     }
+
+    public static void paintCharacter(char character){
+        stringBuilder.append(character).append("  ");
+    }
+    public static void resetStringBuilder(){
+        stringBuilder = new StringBuilder();
+    }
+
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
         Graphics2D g2 = (Graphics2D) g;
 
-        g2.drawRect(99, 49, 501, 51);
+        g2.drawRect(99, 49, 801, 51);
         g2.setColor(Color.WHITE);
-        g2.fillRect(100, 50, 500, 50);
+        g2.fillRect(100, 50, 800, 50);
+
+        g2.setColor(Color.BLACK);
+        g2.setFont(new Font("Cambria", Font.BOLD, 38));
+        g2.drawString(stringBuilder.toString(),105, 90);
     }
 }
