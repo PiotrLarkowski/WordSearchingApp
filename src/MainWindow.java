@@ -15,20 +15,6 @@ public class MainWindow extends JFrame implements ActionListener {
     public static JTextField informationOfSearchingWord;
     public static JTextArea descriptionOfExampleWord;
 
-    public MainWindow() {
-        createJButton();
-        createSearchingBar();
-        createAreaTextFields();
-    }
-
-    private void createSearchingBar() {
-        informationOfSearchingWord = new JTextField("");
-        informationOfSearchingWord.setFocusable(true);
-        informationOfSearchingWord.setFont(new Font("Cambria", Font.BOLD, 32));
-        informationOfSearchingWord.setBounds(100, 50, 500, 50);
-        add(informationOfSearchingWord);
-    }
-
     private void createAreaTextFields() {
         exampleWords = new JTextArea();
         exampleWords.setEnabled(false);
@@ -61,14 +47,16 @@ public class MainWindow extends JFrame implements ActionListener {
     }
 
     public static void createMainWindow() {
-        MainWindow window = new MainWindow();
-
-        window.setSize(1000,Toolkit.getDefaultToolkit().getScreenSize().height);
+        JFrame window = new JFrame("Wyszukiwarka slow");
+        window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         window.setResizable(false);
-        window.setTitle("Wyszukiwarka slow");
 
-        window.setVisible(true);
+        MainPanel gp = new MainPanel();
+        window.add(gp);
+        window.pack();
+
         window.setLocationRelativeTo(null);
+        window.setVisible(true);
     }
 
     public static ArrayList<String> downloadWordsFile() {
@@ -99,14 +87,14 @@ public class MainWindow extends JFrame implements ActionListener {
         for (String selectedWord : selectedWords) {
             wordPass = true;
             for (int j = 0; j < selectedWord.length(); j++) {
-                if(text.charAt(j) != '-'){
+                if (text.charAt(j) != '-') {
                     if (selectedWord.charAt(j) != text.charAt(j)) {
                         wordPass = false;
                         break;
                     }
                 }
             }
-            if(wordPass){
+            if (wordPass) {
                 secondSelectedWords.add(selectedWord);
             }
         }
