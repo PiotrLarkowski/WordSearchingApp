@@ -13,6 +13,10 @@ public class KeyHandler implements KeyListener {
             MainPanel.resetStringBuilder();
         }else if(e.getKeyCode() == KeyEvent.VK_SPACE){
             MainPanel.paintCharacter('-');
+        }else if(e.getKeyCode() == KeyEvent.VK_UP){
+
+        }else if(e.getKeyCode() == KeyEvent.VK_DOWN){
+
         }else{
             MainPanel.paintCharacter((char)e.getKeyCode());
         }
