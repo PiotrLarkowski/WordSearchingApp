@@ -21,7 +21,6 @@ public class MainPanel extends JPanel implements Runnable {
     Thread mainThread;
     final int FPS = 60;
     KeyHandler keyHandler = new KeyHandler();
-    static StringBuilder resultData = new StringBuilder();
     public static ArrayList<String> selectedWords = new ArrayList<>();
     public static ArrayList<String> secondSelectedWords = new ArrayList<>();
     public static JTextArea resultArea;
@@ -65,7 +64,7 @@ public class MainPanel extends JPanel implements Runnable {
                 add(inputValue);
 
         resultArea = new JTextArea();
-        resultArea.setBounds(100, 130, 800, 800);
+        resultArea.setBounds(100, 130, 800, Toolkit.getDefaultToolkit().getScreenSize().height-300);
         resultArea.setEnabled(true);
         add(resultArea);
 
@@ -105,10 +104,6 @@ public class MainPanel extends JPanel implements Runnable {
     }
 
 
-    public static void resetStringBuilder() {
-        resultData = new StringBuilder();
-    }
-
     static void requestFocusOnPanel() {
         inputValue.requestFocus();
     }
@@ -125,7 +120,7 @@ public class MainPanel extends JPanel implements Runnable {
         Graphics2D g2 = (Graphics2D) g;
 
         g2.drawRect(99, 49, 801, 51);
-        g2.drawRect(99, 129, 801, 801);
+        g2.drawRect(99, 129, 801, Toolkit.getDefaultToolkit().getScreenSize().height-299);
         finalResultWordAndDescriptions.clear();
     }
 
@@ -133,7 +128,8 @@ public class MainPanel extends JPanel implements Runnable {
         ArrayList<String> allWords = new ArrayList<>();
         StringBuilder singleWordBuilder = new StringBuilder();
         StringBuilder singleDescriptionBuilder = new StringBuilder();
-        File file = new File("D:\\KRZYZOWKA\\wyrazy_2024.txt");
+//        File file = new File("D:\\KRZYZOWKA\\wyrazy_2024.txt");
+        File file = new File("C:\\Users\\PC\\Documents\\wyrazy_THREE.txt");
 //        File file = new File("C:\\Users\\PC\\Documents\\wyrazy_2024.txt");
         try {
             Scanner myReader = new Scanner(file);
