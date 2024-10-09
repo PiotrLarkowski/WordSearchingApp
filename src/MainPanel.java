@@ -1,5 +1,9 @@
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Scanner;
@@ -11,7 +15,7 @@ public class MainPanel extends JPanel implements Runnable {
     public static ArrayList<String> wordsList = new ArrayList<>();
     static final int WIDTH = 1000;
     static final int HEIGHT = Toolkit.getDefaultToolkit().getScreenSize().height;
-    int lineSeparator = 0;
+    JButton resetFocus;
     Thread mainThread;
     final int FPS = 60;
     KeyHandler keyHandler = new KeyHandler();
@@ -19,6 +23,7 @@ public class MainPanel extends JPanel implements Runnable {
     static StringBuilder searchingInputData = new StringBuilder();
     public static ArrayList<String> selectedWords = new ArrayList<>();
     public static ArrayList<String> secondSelectedWords = new ArrayList<>();
+    public static JTextArea resultArea;
 
     public MainPanel() {
 
@@ -29,6 +34,22 @@ public class MainPanel extends JPanel implements Runnable {
         this.addKeyListener(keyHandler);
         this.setFocusable(true);
 
+        resultArea = new JTextArea();
+        resultArea.setBounds(100, 130, 800, 800);
+        resultArea.setEnabled(true);
+        add(resultArea);
+
+        resetFocus = new JButton("RESET");
+        resetFocus.setBounds(0,0,10,10);
+        resetFocus.addKeyListener(
+                new KeyAdapter() {
+                    public void keyPressed(KeyEvent e) {
+                        if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
+                            requestFocusOnPanel();
+                        }
+                    }
+        });
+        add(resetFocus);
         launchProgram();
 
     }
@@ -78,12 +99,14 @@ public class MainPanel extends JPanel implements Runnable {
         resultData = new StringBuilder();
     }
 
+    void requestFocusOnPanel(){
+        requestFocusInWindow();
+    }
+
     static void printResult() {
-        finalResultWordAndDescriptions = new ArrayList<>();
         availableWordsList = searchingWords();
         for (int i = 0; i < availableWordsList.size(); i++) {
-            finalResultWordAndDescriptions.add(availableWordsList.get(i));
-            finalResultWordAndDescriptions.add(allWordsDescriptionList.get(i));
+            resultArea.setText(availableWordsList.get(i) + allWordsDescriptionList.get(i)+"\n");
         }
     }
 
@@ -94,17 +117,8 @@ public class MainPanel extends JPanel implements Runnable {
         drawBlankField(g2, 50, 50);
         drawGivenString(g2, searchingInputData.toString(), 105, 90, 38);
 
-        drawBlankField(g2, 130, 800);
-        for (int i = 0; i < finalResultWordAndDescriptions.size()-1; i=i+2) {
-            drawGivenString(g2, finalResultWordAndDescriptions.get(i) + finalResultWordAndDescriptions.get(i+1),
-                    110, 170 + lineSeparator, 12);
-            lineSeparator += 20;
-            if(i < finalResultWordAndDescriptions.size()-1){
-                lineSeparator =+ 20;
-                drawGivenString(g2, "KONIEC WYNIKOW",110, 170 + lineSeparator, 16);
-            }
-        }
-        lineSeparator = 0;
+
+        finalResultWordAndDescriptions.clear();
     }
 
     private static void drawGivenString(Graphics2D g2, String text, int x, int y, int size) {
@@ -124,8 +138,8 @@ public class MainPanel extends JPanel implements Runnable {
         ArrayList<String> allWords = new ArrayList<>();
         StringBuilder singleWordBuilder = new StringBuilder();
         StringBuilder singleDescriptionBuilder = new StringBuilder();
-//        File file = new File("D:\\KRZYZOWKA\\wyrazy_2024.txt");
-        File file = new File("C:\\Users\\PC\\Documents\\wyrazy_2024.txt");
+        File file = new File("D:\\KRZYZOWKA\\wyrazy_2024.txt");
+//        File file = new File("C:\\Users\\PC\\Documents\\wyrazy_2024.txt");
         try {
             Scanner myReader = new Scanner(file);
             while (myReader.hasNextLine()) {
