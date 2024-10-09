@@ -1,9 +1,12 @@
 import javax.swing.*;
+import javax.swing.text.AbstractDocument;
+import javax.swing.text.AttributeSet;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.DocumentFilter;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Scanner;
@@ -15,15 +18,14 @@ public class MainPanel extends JPanel implements Runnable {
     public static ArrayList<String> wordsList = new ArrayList<>();
     static final int WIDTH = 1000;
     static final int HEIGHT = Toolkit.getDefaultToolkit().getScreenSize().height;
-    JButton resetFocus;
     Thread mainThread;
     final int FPS = 60;
     KeyHandler keyHandler = new KeyHandler();
     static StringBuilder resultData = new StringBuilder();
-    static StringBuilder searchingInputData = new StringBuilder();
     public static ArrayList<String> selectedWords = new ArrayList<>();
     public static ArrayList<String> secondSelectedWords = new ArrayList<>();
     public static JTextArea resultArea;
+    public static JTextField inputValue;
 
     public MainPanel() {
 
@@ -34,24 +36,40 @@ public class MainPanel extends JPanel implements Runnable {
         this.addKeyListener(keyHandler);
         this.setFocusable(true);
 
+        inputValue = new JTextField();
+        inputValue.setBounds(100, 50, 800, 50);
+        inputValue.setFont(new Font("Cambria", Font.BOLD, 32));
+
+        DocumentFilter filter = new UppercaseDocumentFilter();
+        ((AbstractDocument) inputValue.getDocument()).setDocumentFilter(filter);
+
+        inputValue.addKeyListener(new KeyListener() {
+                                      @Override
+                                      public void keyTyped(KeyEvent e) {
+
+                                      }
+
+                                      @Override
+                                      public void keyPressed(KeyEvent e) {
+                                          int keyCode = e.getKeyCode();
+                                          if (keyCode == KeyEvent.VK_ENTER) {
+                                              printResult();
+                                          }
+                                      }
+
+                                      @Override
+                                      public void keyReleased(KeyEvent e) {
+
+                                      }
+                                  });
+                add(inputValue);
+
         resultArea = new JTextArea();
         resultArea.setBounds(100, 130, 800, 800);
         resultArea.setEnabled(true);
         add(resultArea);
 
-        resetFocus = new JButton("RESET");
-        resetFocus.setBounds(0,0,10,10);
-        resetFocus.addKeyListener(
-                new KeyAdapter() {
-                    public void keyPressed(KeyEvent e) {
-                        if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
-                            requestFocusOnPanel();
-                        }
-                    }
-        });
-        add(resetFocus);
         launchProgram();
-
     }
 
     public void launchProgram() {
@@ -86,27 +104,19 @@ public class MainPanel extends JPanel implements Runnable {
         }
     }
 
-    public static void paintCharacter(char character) {
-        searchingInputData.append(character).append("  ");
-    }
-
-    public static void removeLastCharacter() {
-        searchingInputData.setLength(Math.max(searchingInputData.length() - 1, 0));
-    }
 
     public static void resetStringBuilder() {
-        searchingInputData = new StringBuilder();
         resultData = new StringBuilder();
     }
 
-    void requestFocusOnPanel(){
-        requestFocusInWindow();
+    static void requestFocusOnPanel() {
+        inputValue.requestFocus();
     }
 
     static void printResult() {
         availableWordsList = searchingWords();
         for (int i = 0; i < availableWordsList.size(); i++) {
-            resultArea.setText(availableWordsList.get(i) + allWordsDescriptionList.get(i)+"\n");
+            resultArea.setText(availableWordsList.get(i) + allWordsDescriptionList.get(i) + "\n");
         }
     }
 
@@ -114,24 +124,9 @@ public class MainPanel extends JPanel implements Runnable {
         super.paintComponent(g);
         Graphics2D g2 = (Graphics2D) g;
 
-        drawBlankField(g2, 50, 50);
-        drawGivenString(g2, searchingInputData.toString(), 105, 90, 38);
-
-
+        g2.drawRect(99, 49, 801, 51);
+        g2.drawRect(99, 129, 801, 801);
         finalResultWordAndDescriptions.clear();
-    }
-
-    private static void drawGivenString(Graphics2D g2, String text, int x, int y, int size) {
-        g2.setColor(Color.BLACK);
-        g2.setFont(new Font("Cambria", Font.BOLD, size));
-        g2.drawString(text, x, y);
-    }
-
-    private static void drawBlankField(Graphics2D g2, int y, int height) {
-        g2.setColor(Color.BLACK);
-        g2.drawRect(100 - 1, y - 1, 800 + 1, height + 1);
-        g2.setColor(Color.WHITE);
-        g2.fillRect(100, y, 800, height);
     }
 
     public static ArrayList<String> downloadWordsFile() {
@@ -169,9 +164,8 @@ public class MainPanel extends JPanel implements Runnable {
 
     private static ArrayList<String> searchingWords() {
         selectedWords.clear();
-        searchingInputData = new StringBuilder(searchingInputData.toString().replaceAll("\\s", ""));
 
-        String text = searchingInputData.toString();
+        String text = inputValue.getText();
         downloadWordsFile();
         boolean wordPass;
         for (String s : wordsList) {
@@ -194,5 +188,18 @@ public class MainPanel extends JPanel implements Runnable {
             }
         }
         return (secondSelectedWords);
+    }
+}
+
+class UppercaseDocumentFilter extends DocumentFilter {
+    public void insertString(DocumentFilter.FilterBypass fb, int offset,
+                             String text, AttributeSet attr) throws BadLocationException {
+        fb.insertString(offset, text.toUpperCase(), attr);
+    }
+
+    public void replace(DocumentFilter.FilterBypass fb, int offset, int length,
+                        String text, AttributeSet attrs) throws BadLocationException {
+
+        fb.replace(offset, length, text.toUpperCase(), attrs);
     }
 }
