@@ -4,7 +4,6 @@ import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DocumentFilter;
 import java.awt.*;
-import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.File;
@@ -20,7 +19,6 @@ public class MainPanel extends JPanel implements Runnable {
     static final int HEIGHT = Toolkit.getDefaultToolkit().getScreenSize().height;
     Thread mainThread;
     final int FPS = 60;
-    KeyHandler keyHandler = new KeyHandler();
     public static ArrayList<String> selectedWords = new ArrayList<>();
     public static ArrayList<String> secondSelectedWords = new ArrayList<>();
     public static JTextArea resultArea;
@@ -32,10 +30,16 @@ public class MainPanel extends JPanel implements Runnable {
         this.setBackground(new Color(40, 190, 190));
         this.setLayout(null);
 
-        this.addKeyListener(keyHandler);
+//        this.addKeyListener(keyHandler);
         this.setFocusable(true);
 
-        inputValue = new JTextField();
+        inputValue = new JTextField() {
+
+            public void addNotify() {
+                super.addNotify();
+                requestFocus();
+            }
+        };
         inputValue.setBounds(100, 50, 800, 50);
         inputValue.setFont(new Font("Cambria", Font.BOLD, 32));
 
@@ -62,6 +66,7 @@ public class MainPanel extends JPanel implements Runnable {
                                       }
                                   });
                 add(inputValue);
+        inputValue.requestFocus();
 
         resultArea = new JTextArea();
         resultArea.setBounds(100, 130, 800, Toolkit.getDefaultToolkit().getScreenSize().height-300);
@@ -110,8 +115,10 @@ public class MainPanel extends JPanel implements Runnable {
 
     static void printResult() {
         availableWordsList = searchingWords();
-        for (int i = 0; i < availableWordsList.size(); i++) {
-            resultArea.setText(availableWordsList.get(i) + allWordsDescriptionList.get(i) + "\n");
+        for (int i = 0; i < availableWordsList.size()-1; i++) {
+            if(!availableWordsList.get(i).isEmpty()){
+                resultArea.setText(resultArea.getText() + availableWordsList.get(i) + allWordsDescriptionList.get(i) + "\n");
+            }
         }
     }
 
@@ -128,10 +135,10 @@ public class MainPanel extends JPanel implements Runnable {
         ArrayList<String> allWords = new ArrayList<>();
         StringBuilder singleWordBuilder = new StringBuilder();
         StringBuilder singleDescriptionBuilder = new StringBuilder();
-//        File file = new File("D:\\KRZYZOWKA\\wyrazy_2024.txt");
-        File file = new File("C:\\Users\\PC\\Documents\\wyrazy_THREE.txt");
+      File file = new File("D:\\KRZYZOWKA\\wyrazy_2024.txt");
 //        File file = new File("C:\\Users\\PC\\Documents\\wyrazy_2024.txt");
         try {
+            int numberOfWord = 0;
             Scanner myReader = new Scanner(file);
             while (myReader.hasNextLine()) {
                 String word = myReader.nextLine();
@@ -142,13 +149,14 @@ public class MainPanel extends JPanel implements Runnable {
                         for (int j = i; j < word.length(); j++) {
                             singleDescriptionBuilder.append(word.charAt(j));
                         }
-                        allWordsDescriptionList.add(singleDescriptionBuilder.toString());
+                        allWordsDescriptionList.add(numberOfWord, singleDescriptionBuilder.toString());
                         break;
                     }
                 }
-                wordsList.add(singleWordBuilder.toString());
+                allWords.add(numberOfWord, singleWordBuilder.toString());
                 singleDescriptionBuilder = new StringBuilder();
                 singleWordBuilder = new StringBuilder();
+                numberOfWord++;
                 System.out.println(word);
             }
             myReader.close();
@@ -160,27 +168,33 @@ public class MainPanel extends JPanel implements Runnable {
 
     private static ArrayList<String> searchingWords() {
         selectedWords.clear();
-
+        ArrayList<Integer> wordPosition = new ArrayList<>();
         String text = inputValue.getText();
-        downloadWordsFile();
+        wordsList = downloadWordsFile();
         boolean wordPass;
-        for (String s : wordsList) {
-            if (s.length() == text.length()) {
-                selectedWords.add(s);
+        for (int i = 0; i < wordsList.size(); i++) {
+            selectedWords.add(i,"");
+            secondSelectedWords.add(i,"");
+            wordPosition.add(0);
+        }
+        for (int i = 0; i < wordsList.size(); i++) {
+            if (wordsList.get(i).length() == text.length()) {
+                selectedWords.add(i, wordsList.get(i));
+                wordPosition.add(i, i);
             }
         }
-        for (String selectedWord : selectedWords) {
+        for (int i = 0; i < selectedWords.size(); i++) {
             wordPass = true;
-            for (int j = 0; j < selectedWord.length(); j++) {
+            for (int j = 0; j < selectedWords.get(i).length(); j++) {
                 if (text.charAt(j) != '-') {
-                    if (selectedWord.charAt(j) != text.charAt(j)) {
+                    if (selectedWords.get(i).charAt(j) != text.charAt(j)) {
                         wordPass = false;
                         break;
                     }
                 }
             }
             if (wordPass) {
-                secondSelectedWords.add(selectedWord);
+                secondSelectedWords.set(wordPosition.get(i), selectedWords.get(i));
             }
         }
         return (secondSelectedWords);
