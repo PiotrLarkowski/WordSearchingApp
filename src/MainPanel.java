@@ -25,12 +25,6 @@ public class MainPanel extends JPanel implements Runnable {
     public static JTextField inputValue;
 
     public MainPanel() {
-
-        this.setPreferredSize(new Dimension(WIDTH, HEIGHT));
-        this.setBackground(new Color(40, 190, 190));
-        this.setLayout(null);
-
-//        this.addKeyListener(keyHandler);
         this.setFocusable(true);
 
         inputValue = new JTextField() {
@@ -95,7 +89,17 @@ public class MainPanel extends JPanel implements Runnable {
                 ));
         resultArea.setBounds(100, 130, 800, Toolkit.getDefaultToolkit().getScreenSize().height-300);
         resultArea.setEnabled(true);
-        add(resultArea);
+        resultArea.setLineWrap(true);
+
+        JScrollPane scrollPane = new JScrollPane(resultArea, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        scrollPane.setBounds(100, 130, 800, Toolkit.getDefaultToolkit().getScreenSize().height-300);
+        scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+
+        add(scrollPane);
+
+        this.setPreferredSize(new Dimension(WIDTH, HEIGHT));
+        this.setBackground(new Color(40, 190, 190));
+        this.setLayout(null);
 
         launchProgram();
     }
@@ -136,6 +140,7 @@ public class MainPanel extends JPanel implements Runnable {
 
     static void printResult() {
         resultArea.setText("");
+        availableWordsList.clear();
         availableWordsList = searchingWords();
         for (int i = 0; i < availableWordsList.size()-1; i++) {
             if(!availableWordsList.get(i).isEmpty()){
