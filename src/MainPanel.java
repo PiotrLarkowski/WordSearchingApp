@@ -57,7 +57,10 @@ public class MainPanel extends JPanel implements Runnable {
                                           int keyCode = e.getKeyCode();
                                           if (keyCode == KeyEvent.VK_ENTER) {
                                               printResult();
+                                          }else if (keyCode == KeyEvent.VK_SPACE) {
+                                              inputValue.setText(inputValue.getText()+"-"+KeyEvent.VK_BACK_SPACE);
                                           }
+
                                       }
 
                                       @Override
@@ -69,6 +72,11 @@ public class MainPanel extends JPanel implements Runnable {
         inputValue.requestFocus();
 
         resultArea = new JTextArea();
+        resultArea.setBorder(
+                BorderFactory.createCompoundBorder(
+                        BorderFactory.createEmptyBorder(20, 20, 0, 0 ),
+                        resultArea.getBorder()
+                ));
         resultArea.setBounds(100, 130, 800, Toolkit.getDefaultToolkit().getScreenSize().height-300);
         resultArea.setEnabled(true);
         add(resultArea);
@@ -135,8 +143,8 @@ public class MainPanel extends JPanel implements Runnable {
         ArrayList<String> allWords = new ArrayList<>();
         StringBuilder singleWordBuilder = new StringBuilder();
         StringBuilder singleDescriptionBuilder = new StringBuilder();
-      File file = new File("D:\\KRZYZOWKA\\wyrazy_2024.txt");
-//        File file = new File("C:\\Users\\PC\\Documents\\wyrazy_2024.txt");
+//      File file = new File("D:\\KRZYZOWKA\\wyrazy_2024.txt");
+        File file = new File("C:\\Users\\PC\\Documents\\wyrazy_2024.txt");
         try {
             int numberOfWord = 0;
             Scanner myReader = new Scanner(file);
