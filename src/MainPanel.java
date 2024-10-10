@@ -24,9 +24,37 @@ public class MainPanel extends JPanel implements Runnable {
     public static JTextArea resultArea;
     public static JTextField inputValue;
 
+    //Constructor
     public MainPanel() {
+        createTextFieldForSearchingOnJPanel();
+        createAreaTextFieldObjectOnJPanel();
+        setPanelPreferences();
+        launchProgram();
+    }
+    private void setPanelPreferences() {
         this.setFocusable(true);
+        this.setPreferredSize(new Dimension(WIDTH, HEIGHT));
+        this.setBackground(new Color(40, 190, 190));
+        this.setLayout(null);
+    }
+    private void createAreaTextFieldObjectOnJPanel() {
+        resultArea = new JTextArea();
+        resultArea.setBorder(
+                BorderFactory.createCompoundBorder(
+                        BorderFactory.createEmptyBorder(20, 20, 0, 0 ),
+                        resultArea.getBorder()
+                ));
+        resultArea.setBounds(100, 130, 800, Toolkit.getDefaultToolkit().getScreenSize().height-300);
+        resultArea.setEnabled(true);
+        resultArea.setLineWrap(true);
 
+        JScrollPane scrollPane = new JScrollPane(resultArea, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        scrollPane.setBounds(100, 130, 800, Toolkit.getDefaultToolkit().getScreenSize().height-300);
+        scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+
+        add(scrollPane);
+    }
+    private void createTextFieldForSearchingOnJPanel() {
         inputValue = new JTextField() {
 
             public void addNotify() {
@@ -54,7 +82,7 @@ public class MainPanel extends JPanel implements Runnable {
                                           if(!keyPressed) {
                                               keyPressed = true;
                                               if (keyCode == KeyEvent.VK_ENTER) {
-                                                  printResult();
+                                                  printResultInAreaField();
                                               } else if (keyCode == KeyEvent.VK_SPACE) {
                                                   inputValue.setText(inputValue.getText() + " - ");
                                                   if (inputValue.getText() != null) {
@@ -78,39 +106,18 @@ public class MainPanel extends JPanel implements Runnable {
 
                                       }
                                   });
-                add(inputValue);
+        add(inputValue);
         inputValue.requestFocus();
-
-        resultArea = new JTextArea();
-        resultArea.setBorder(
-                BorderFactory.createCompoundBorder(
-                        BorderFactory.createEmptyBorder(20, 20, 0, 0 ),
-                        resultArea.getBorder()
-                ));
-        resultArea.setBounds(100, 130, 800, Toolkit.getDefaultToolkit().getScreenSize().height-300);
-        resultArea.setEnabled(true);
-        resultArea.setLineWrap(true);
-
-        JScrollPane scrollPane = new JScrollPane(resultArea, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        scrollPane.setBounds(100, 130, 800, Toolkit.getDefaultToolkit().getScreenSize().height-300);
-        scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
-
-        add(scrollPane);
-
-        this.setPreferredSize(new Dimension(WIDTH, HEIGHT));
-        this.setBackground(new Color(40, 190, 190));
-        this.setLayout(null);
-
-        launchProgram();
     }
-
     public void launchProgram() {
         mainThread = new Thread(this);
         mainThread.start();
     }
-
     @Override
     public void run() {
+        mainLoopForMultiplyRunMethodPintComponent();
+    }
+    private void mainLoopForMultiplyRunMethodPintComponent() {
         double drawInterval = (double) 1000000000 / FPS;
         double delta = 0;
         long lastTime = System.nanoTime();
@@ -135,21 +142,20 @@ public class MainPanel extends JPanel implements Runnable {
             }
         }
     }
-
-
-
-    static void printResult() {
+    static void printResultInAreaField() {
         resultArea.setText("");
         availableWordsList.clear();
-        availableWordsList = searchingWords();
+        availableWordsList = searchingWordsMatchForGivenText();
         for (int i = 0; i < availableWordsList.size()-1; i++) {
             if(!availableWordsList.get(i).isEmpty()){
                 resultArea.setText(resultArea.getText() + availableWordsList.get(i) + allWordsDescriptionList.get(i) + "\n");
             }
         }
     }
-
     public void paintComponent(Graphics g) {
+        paintOneTimeOnScreen(g);
+    }
+    private void paintOneTimeOnScreen(Graphics g) {
         super.paintComponent(g);
         Graphics2D g2 = (Graphics2D) g;
 
@@ -157,8 +163,7 @@ public class MainPanel extends JPanel implements Runnable {
         g2.drawRect(99, 129, 801, Toolkit.getDefaultToolkit().getScreenSize().height-299);
         finalResultWordAndDescriptions.clear();
     }
-
-    public static ArrayList<String> downloadWordsFile() {
+    public static ArrayList<String> downloadWordsFileForSearchingWod() {
         ArrayList<String> allWords = new ArrayList<>();
         StringBuilder singleWordBuilder = new StringBuilder();
         StringBuilder singleDescriptionBuilder = new StringBuilder();
@@ -192,8 +197,7 @@ public class MainPanel extends JPanel implements Runnable {
         }
         return allWords;
     }
-
-    private static ArrayList<String> searchingWords() {
+    private static ArrayList<String> searchingWordsMatchForGivenText() {
         selectedWords.clear();
         ArrayList<Integer> wordPosition = new ArrayList<>();
         StringBuilder stringBuilder = new StringBuilder();
@@ -203,7 +207,7 @@ public class MainPanel extends JPanel implements Runnable {
             }
         }
         String text = stringBuilder.toString();
-        wordsList = downloadWordsFile();
+        wordsList = downloadWordsFileForSearchingWod();
         boolean wordPass;
         for (int i = 0; i < wordsList.size(); i++) {
             selectedWords.add(i,"");
@@ -233,7 +237,7 @@ public class MainPanel extends JPanel implements Runnable {
         return (secondSelectedWords);
     }
 }
-
+//Class for printing capital letters in search TextField
 class UppercaseDocumentFilter extends DocumentFilter {
     public void insertString(DocumentFilter.FilterBypass fb, int offset,
                              String text, AttributeSet attr) throws BadLocationException {
