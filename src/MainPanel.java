@@ -68,6 +68,11 @@ public class MainPanel extends JPanel implements Runnable {
         DocumentFilter filter = new UppercaseDocumentFilter();
         ((AbstractDocument) inputValue.getDocument()).setDocumentFilter(filter);
 
+        addKeyListenerToTextField();
+        add(inputValue);
+        inputValue.requestFocus();
+    }
+    private static void addKeyListenerToTextField() {
         inputValue.addKeyListener(new KeyListener() {
             boolean keyPressed = false;
 
@@ -106,8 +111,6 @@ public class MainPanel extends JPanel implements Runnable {
 
                                       }
                                   });
-        add(inputValue);
-        inputValue.requestFocus();
     }
     public void launchProgram() {
         mainThread = new Thread(this);
