@@ -47,6 +47,8 @@ public class MainPanel extends JPanel implements Runnable {
         ((AbstractDocument) inputValue.getDocument()).setDocumentFilter(filter);
 
         inputValue.addKeyListener(new KeyListener() {
+            boolean keyPressed = false;
+
                                       @Override
                                       public void keyTyped(KeyEvent e) {
 
@@ -55,14 +57,28 @@ public class MainPanel extends JPanel implements Runnable {
                                       @Override
                                       public void keyPressed(KeyEvent e) {
                                           int keyCode = e.getKeyCode();
-                                          if (keyCode == KeyEvent.VK_ENTER) {
-                                              printResult();
-                                          }else if (keyCode == KeyEvent.VK_SPACE) {
-                                              inputValue.setText(inputValue.getText()+"-"+KeyEvent.VK_BACK_SPACE);
+                                          if(!keyPressed) {
+                                              keyPressed = true;
+                                              if (keyCode == KeyEvent.VK_ENTER) {
+                                                  printResult();
+                                              } else if (keyCode == KeyEvent.VK_SPACE) {
+                                                  inputValue.setText(inputValue.getText() + " - ");
+                                                  if (inputValue.getText() != null) {
+                                                      inputValue.setText(inputValue.getText().substring(0, inputValue.getText().length() - 1));
+                                                  }
+                                              }else if(keyCode == KeyEvent.VK_BACK_SPACE){
+                                                  if (inputValue.getText() != null && inputValue.getText().length()>2) {
+                                                      inputValue.setText(inputValue.getText().substring(0, inputValue.getText().length() - 1));
+                                                  }
+                                              }else {
+                                                  inputValue.setText(inputValue.getText() + " " + (char) e.getKeyCode());
+                                                  if (inputValue.getText() != null) {
+                                                      inputValue.setText(inputValue.getText().substring(0, inputValue.getText().length() - 1));
+                                                  }
+                                              }
                                           }
-
+                                          keyPressed = false;
                                       }
-
                                       @Override
                                       public void keyReleased(KeyEvent e) {
 
@@ -117,11 +133,9 @@ public class MainPanel extends JPanel implements Runnable {
     }
 
 
-    static void requestFocusOnPanel() {
-        inputValue.requestFocus();
-    }
 
     static void printResult() {
+        resultArea.setText("");
         availableWordsList = searchingWords();
         for (int i = 0; i < availableWordsList.size()-1; i++) {
             if(!availableWordsList.get(i).isEmpty()){
@@ -143,8 +157,8 @@ public class MainPanel extends JPanel implements Runnable {
         ArrayList<String> allWords = new ArrayList<>();
         StringBuilder singleWordBuilder = new StringBuilder();
         StringBuilder singleDescriptionBuilder = new StringBuilder();
-//      File file = new File("D:\\KRZYZOWKA\\wyrazy_2024.txt");
-        File file = new File("C:\\Users\\PC\\Documents\\wyrazy_2024.txt");
+      File file = new File("D:\\KRZYZOWKA\\wyrazy_2024.txt");
+//        File file = new File("C:\\Users\\PC\\Documents\\wyrazy_2024.txt");
         try {
             int numberOfWord = 0;
             Scanner myReader = new Scanner(file);
@@ -177,7 +191,13 @@ public class MainPanel extends JPanel implements Runnable {
     private static ArrayList<String> searchingWords() {
         selectedWords.clear();
         ArrayList<Integer> wordPosition = new ArrayList<>();
-        String text = inputValue.getText();
+        StringBuilder stringBuilder = new StringBuilder();
+        for (int i = 0; i < inputValue.getText().length(); i++) {
+            if(inputValue.getText().charAt(i)!=' '){
+                stringBuilder.append(inputValue.getText().charAt(i));
+            }
+        }
+        String text = stringBuilder.toString();
         wordsList = downloadWordsFile();
         boolean wordPass;
         for (int i = 0; i < wordsList.size(); i++) {
@@ -191,7 +211,7 @@ public class MainPanel extends JPanel implements Runnable {
                 wordPosition.add(i, i);
             }
         }
-        for (int i = 0; i < selectedWords.size(); i++) {
+        for (int i = 1; i < selectedWords.size(); i++) {
             wordPass = true;
             for (int j = 0; j < selectedWords.get(i).length(); j++) {
                 if (text.charAt(j) != '-') {
